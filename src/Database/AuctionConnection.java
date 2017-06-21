@@ -308,7 +308,7 @@ public class AuctionConnection {
      * failed.
      * @throws SQLException if failed to insert bid into the database.
      */
-    public Boolean addBid(double amount, int auctionID, int userID, double price) throws SQLException {
+    public Boolean addBid(double amount, int auctionID, int userID, double price, long ping) throws SQLException {
         conn.getConnection();
         User user = userConn.getUser(userID);
         Auction auction = getAuction(auctionID);

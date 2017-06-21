@@ -17,6 +17,10 @@ import Exceptions.NotEnoughMoneyException;
 import Interfaces.IAuction;
 import Interfaces.IPlaceBid;
 import grandexchange.RegistryManager;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.InetAddress;
 import java.net.URL;
 import java.rmi.RemoteException;
 import java.sql.SQLException;
@@ -363,8 +367,8 @@ public class AuctionController implements Initializable {
                     int timeHours = timeSeconds;
                     int daysToGo = (int) Math.floor(timeDays / 60 / 60 / 24);
                     int hoursToGo = (int) Math.floor(timeSeconds / 60 / 60) - daysToGo * 24;
-                    int minutesToGo = (int) Math.floor(timeSeconds / 60)-(hoursToGo*60)-(daysToGo*24*60);
-                    int secondsToGo = timeSeconds -(hoursToGo*60*60)-(daysToGo*24*60*60)-(minutesToGo*60);
+                    int minutesToGo = (int) Math.floor(timeSeconds / 60) - (hoursToGo * 60) - (daysToGo * 24 * 60);
+                    int secondsToGo = timeSeconds - (hoursToGo * 60 * 60) - (daysToGo * 24 * 60 * 60) - (minutesToGo * 60);
                     String hours = Integer.toString(hoursToGo);
                     String minutes = Integer.toString(minutesToGo);
                     String seconds = Integer.toString(secondsToGo);
@@ -473,13 +477,13 @@ public class AuctionController implements Initializable {
         checkAuctionStatus();
     }
 
-    public void bidButtonClick() throws RemoteException, NotEnoughMoneyException, SQLException {
+    public void bidButtonClick() throws RemoteException, NotEnoughMoneyException, SQLException, IOException {
         RM.getPlaceBidInterface();
         this.bid = RM.getBid();
         if (auction.getCurrentPrice() < Double.parseDouble(txtPriceToBid.getText())) {
             int reply = JOptionPane.showConfirmDialog(null, "Are you sure you want to Bid " + txtPriceToBid.getText(), "Are You Sure?", JOptionPane.YES_NO_OPTION);
             if (reply == JOptionPane.YES_OPTION) {
-                bid.placeBid(1, loggedInUser.getUsername(), auction.getId(), Double.parseDouble(txtPriceToBid.getText()));
+                bid.placeBid(1, loggedInUser.getUsername(), auction.getId(), Double.parseDouble(txtPriceToBid.getText()), checkPing("localhost"));
                 update();
                 JOptionPane.showMessageDialog(null, "Your bid has been placed");
             } else {
@@ -503,7 +507,7 @@ public class AuctionController implements Initializable {
             int reply = JOptionPane.showConfirmDialog(null, "Are you sure you want to buy " + txtUnitstoBuy.getText() + "\nitems with the price of: €" + auction.getInstabuyPrice() + " a item \nand a total of: €" + totalPrice, "Are you sure?", JOptionPane.YES_NO_OPTION);
             if (reply == JOptionPane.YES_OPTION) {
                 int units = Integer.parseInt(txtUnitstoBuy.getText());
-                bid.placeBid(units, loggedInUser.getUsername(), auction.getId(), auction.getInstabuyPrice());
+                bid.placeBid(units, loggedInUser.getUsername(), auction.getId(), auction.getInstabuyPrice(), 0);
                 update();
             } else {
                 JOptionPane.showMessageDialog(null, "Canceled");
@@ -586,4 +590,17 @@ public class AuctionController implements Initializable {
         stage.close();
     }
 
+    public long checkPing(String host) throws IOException {
+
+        long currentTime = System.currentTimeMillis();
+        boolean isPinged = InetAddress.getByName(host).isReachable(2000); 
+        currentTime = System.currentTimeMillis() - currentTime;
+        if (isPinged) {
+            System.out.println("pinged successfully in " + currentTime + "millisecond");
+        } else {
+            System.out.println("PIng failed.");
+        }
+        return currentTime;
+
+    }
 }

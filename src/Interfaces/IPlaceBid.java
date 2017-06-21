@@ -32,7 +32,7 @@ import java.rmi.Remote;
     * @exception java.rmi.RemoteException  this method can throw a RemoteException since it uses RMI
     * @exception NotEnoughMoneyException   Can throw a NotEnoughMoneyException when the user's money balance < amount
     */
-    public boolean placeBid(double amount,String userName, int AuctionID, double price)
+    public boolean placeBid(double amount,String userName, int AuctionID, double price, long ping)
             throws java.rmi.RemoteException, NotEnoughMoneyException;
     
     public boolean placeBuy(int amount,String userName, int AuctionID, double price)

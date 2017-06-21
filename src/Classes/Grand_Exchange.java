@@ -56,6 +56,7 @@ public class Grand_Exchange extends UnicastRemoteObject implements Observer, IAu
     @Override
     public User getLoggedInUser() {
         return loggedInUser;
+        
     }
 
     /**
@@ -596,7 +597,7 @@ public class Grand_Exchange extends UnicastRemoteObject implements Observer, IAu
     }
 
     @Override
-    public boolean placeBid(double amount, String userName, int AuctionID, double price) throws RemoteException, NotEnoughMoneyException {
+    public boolean placeBid(double amount, String userName, int AuctionID, double price, long ping) throws RemoteException, NotEnoughMoneyException {
         UserConnection DB = new UserConnection();
         int index = -1;
         for (int i = 0; i < auctions.size(); i++) {
@@ -612,7 +613,8 @@ public class Grand_Exchange extends UnicastRemoteObject implements Observer, IAu
         System.out.println(u.getUserID());
         System.out.println(price);
         System.out.println(AuctionID);
-        auctions.get(index).addBid(new Bid(AuctionID, u, price));
+        Bid bid = new bid(AuctionID, u , price);
+        auctions.get(index).addBid(amount. AuctionID, u.getUserID(), price, ping);
         //return auctionConn.addBid(amount, AuctionID, userID, price);
         return true;
     }
@@ -714,4 +716,6 @@ public class Grand_Exchange extends UnicastRemoteObject implements Observer, IAu
         auctions.add(new Standard(id,new User("test2222","password","xtest2222","test@test.nl",true,500,"https://fiom.nl/sites/default/files/styles/section_quote/public/nieuws_tiener.jpg?"),p,startingprice,quantity, new Timestamp(2017,6,2,15,35,52,2),new Timestamp(2017,6,20,15,35,52,2),StatusEnum.New,description,imageUrl,3000));
         return addAuctionToDB(userID, productID, startingprice, instabuyPrice, instabuyable, quantity, iets, iets2, auctionType, iets3, imageUrl, description);
     }
+
+  
 }
