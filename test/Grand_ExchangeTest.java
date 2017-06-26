@@ -9,6 +9,7 @@ import Classes.Auctions.Auction;
 import Classes.Auctions.StatusEnum;
 import Database.AuctionConnection;
 import Database.ProductConnection;
+import Exceptions.NotEnoughMoneyException;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import junit.framework.Assert;
@@ -149,5 +150,58 @@ public class Grand_ExchangeTest {
    
              assertEquals(GE.login("Robin", "test").getUserEmail(), "Robin.welten@planet.nl");
     }
+    @Test
+    public void TestgetUser() throws RemoteException
+    {
+        User r = GE.getUser("robin");
+        assertEquals(r.getUserEmail(), "Robin.welten@planet.nl");
+    }
+    
+    @Test
+    public void TestregisterUser()
+    {
+        assertEquals(GE.registerUser("moob", "test1234", "robin", "robin@weltendienstverlening.nl"), "Succesfully registered new user!");
+    }
+    
+    @Test 
+    public void TestRegisterUserWrong()
+    {
+     assertEquals(GE.registerUser("robin", "test1234", "robin", "robin@weltendienstverlening.nl"), "\n -Username is already used");
+
+    }
+    
+    @Test
+    public void TestplaceBid() throws RemoteException, NotEnoughMoneyException
+    {
+       assertTrue(GE.placeBid(1, "Robin", 1, 500, 20)); 
+       assertFalse(GE.placeBid(1, "moob", 1, 500, 10));
+    }
+    
+    @Test
+    public void TestLogout() throws RemoteException
+    {
+        GE.login("robin", "1234");
+        assertTrue(GE.logout("robin"));
+    }
+    
+    @Test 
+    public void TestLogoutFail() throws RemoteException
+    {
+        assertFalse(GE.logout("robin"));
+    }
+        
+    
+    @Test
+    public void TestgenerateAndSendEmail()
+    {
+        
+    }
+
+    
+    public void TestsetIsAuthorized() throws RemoteException
+    {
+        assertTrue(GE.setIsAuthorized("robin", true));
+    }
 
 }
+
