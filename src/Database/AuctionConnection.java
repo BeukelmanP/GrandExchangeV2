@@ -37,7 +37,7 @@ public class AuctionConnection {
     private ResultSet myRs;
     private Auction auction;
     private ArrayList<Auction> auctions;
-
+    private ArrayList<Bid> bids;
     // Connections
     private UserConnection userConn = new UserConnection();
     private Connection conn = new Connection();
@@ -308,11 +308,20 @@ public class AuctionConnection {
      * failed.
      * @throws SQLException if failed to insert bid into the database.
      */
-    public Boolean addBid(double amount, int auctionID, int userID, double price, long ping) throws SQLException {
+    public synchronized Boolean addBid(double amount, int auctionID, int userID, double price, long ping) throws SQLException, InterruptedException {
         conn.getConnection();
         User user = userConn.getUser(userID);
         Auction auction = getAuction(auctionID);
-
+        Bid bid = new Bid(auctionID, user, amount, ping, price);
+        bids.add(bid);
+        wait(200);
+        if (bids.size() > 1) {
+            if (bids.get(1).getAuctionID() == bids.get(2).getAuctionID() && bids.get(1).getPrice() == bids.get(2).getPrice()) {
+                if (bids.get(1).getPing() < bids.get(2).getPing()) {
+                    return false;
+                }
+            }
+        }
         // Checks if User exsists
         if (user != null) {
             // Checks if Saldo is high enough
@@ -335,6 +344,10 @@ public class AuctionConnection {
                     Logger.getLogger(Connection.class.getName()).log(Level.SEVERE, null, ex);
                     System.out.println(ex);
                     return false;
+                }
+                finally
+                {
+                    bids.clear();
                 }
             } else {
                 conn.closeConnection();

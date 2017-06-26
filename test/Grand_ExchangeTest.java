@@ -7,6 +7,9 @@ package Classes;
 
 import Classes.Auctions.Auction;
 import Classes.Auctions.StatusEnum;
+import Database.AuctionConnection;
+import Database.ProductConnection;
+import java.rmi.RemoteException;
 import java.util.Collection;
 import junit.framework.Assert;
 import org.junit.After;
@@ -27,11 +30,13 @@ public class Grand_ExchangeTest {
     Product p;
     Auction a;
     Transaction trans;
+    ProductConnection productCon = new ProductConnection();
+    AuctionConnection aucCon = new AuctionConnection();
 
     @Before
     public void setUp() {
         //gebruiker wachtwoord
-        TestUser = new User("Robin", "test");
+        TestUser = new User("Robin", "test", "welten", "robin.welten@planet.nl", true, 10000, "imagelink");
 
     }
 /** 
@@ -100,11 +105,12 @@ public class Grand_ExchangeTest {
     public void TestRemoveAuction() {
         Collection<Auction> auc;
         auc = GE.getAuctions();
-        a = new Auction(TestUser, p, 15, 2, goed, "test",10);
+        int i = auc.size();
+        a = new Auction(TestUser, p, 15, 2, StatusEnum.GoodAsNew, "test",10);
         GE.addAuction(a);
-        assertEquals(auc.size(), 1);
+        assertEquals(auc.size(), i);
         GE.removeAuction(a);
-        assertEquals(auc.size(), 0);
+        assertEquals(auc.size(), i-1);
 
     }
 /** 
@@ -117,6 +123,31 @@ public class Grand_ExchangeTest {
         GE.handleTransaction(trans);
         Collection<Transaction> col = TestUser.getTransactionHistory();
         assertEquals(col.size(), 1);
+    }
+    
+    @Test
+    public void TestaddProductToDB()
+    {
+        p = new Product(666, "1234", "testprodcut", "gewoon een test");
+        GE.addProductToDB(p.getName(), p.getDescription(), p.getId());
+        assertEquals(productCon.getProduct(666).getId(), 666);
+        
+    }
+   
+    
+    @Test
+    public void TestaddAuctionToDB()
+    {
+        a = new Auction(TestUser, p, 15, 2, StatusEnum.GoodAsNew, "test",10);
+        GE.addAuctionToDB(TestUser.getUserID(), p.getId(), 500, 300, 1,5, 20, 200, "nieuw", 1, "imgurl", "test Acitopm");
+        assertEquals(aucCon.getAuction(a.getId()), 500);
+    }
+    
+    @Test
+    public void TestLogin() throws RemoteException
+    {
+   
+             assertEquals(GE.login("Robin", "test").getUserEmail(), "Robin.welten@planet.nl");
     }
 
 }
