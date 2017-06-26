@@ -613,8 +613,9 @@ public class Grand_Exchange extends UnicastRemoteObject implements Observer, IAu
         System.out.println(u.getUserID());
         System.out.println(price);
         System.out.println(AuctionID);
-        Bid bid = new bid(AuctionID, u , price);
-        auctions.get(index).addBid(amount. AuctionID, u.getUserID(), price, ping);
+        Bid bid = new Bid(AuctionID, u , price, ping);
+        auctions.get(index).addBid(bid);
+        
         //return auctionConn.addBid(amount, AuctionID, userID, price);
         return true;
     }
