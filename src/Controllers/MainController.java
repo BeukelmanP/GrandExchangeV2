@@ -78,10 +78,7 @@ public class MainController extends UnicastRemoteObject implements Initializable
     }
 
     public MainController() throws RemoteException {
-        
     }
-
-    
     
     public void setUp(RegistryManager RM) throws RemoteException {
         this.RM = RM;
