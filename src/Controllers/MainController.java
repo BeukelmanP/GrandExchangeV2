@@ -301,8 +301,6 @@ public class MainController extends UnicastRemoteObject implements Initializable
         switch(pce.getPropertyName()) {
            case "currentpricechange" :
               // Statements
-//                IAuctionInfo myAuctionInfoInterface = this.auctionInterface.getIAuctionInterface((int)pce.getNewValue());
-//                allAuctions.getChildren().get(5);
                 IAuctionInfo myAuctionInfoInterface = auctionInterface.getIAuctionInterface((int)pce.getNewValue());
                 
                 for (Node thisPane : allAuctions.getChildren())
