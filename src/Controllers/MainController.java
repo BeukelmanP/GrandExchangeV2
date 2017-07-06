@@ -6,6 +6,7 @@
 package Controllers;
 
 import Classes.CategoryEnum;
+import Interfaces.IAuction;
 import Interfaces.IAuctionInfo;
 import fontyspublisher.IRemotePropertyListener;
 import grandexchange.RegistryManager;
@@ -82,7 +83,6 @@ public class MainController implements Initializable, IRemotePropertyListener {
         this.auctionInterface.subscribe(this, "newauction");
         this.auctionInterface.subscribe(this, "currentpricechange");
 
-        //this.refreshAuctions();
         try {
             loggedInUserImage.setImage(new Image(RM.getUser().getImageURL()));
         } catch (NullPointerException ex) {
