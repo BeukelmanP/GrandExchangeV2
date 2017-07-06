@@ -5,16 +5,13 @@
  */
 package Controllers;
 
-import Classes.Auctions.Auction;
 import Classes.CategoryEnum;
-import Interfaces.IAuction;
 import Interfaces.IAuctionInfo;
 import grandexchange.RegistryManager;
 import java.io.IOException;
 import java.net.URL;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutionException;
@@ -78,7 +75,6 @@ public class MainController implements Initializable {
     public void setUp(RegistryManager RM) throws RemoteException {
         this.RM = RM;
         RM.getAuctionInterface();
-        //this.refreshAuctions();
         try {
             loggedInUserImage.setImage(new Image(RM.getUser().getImageURL()));
         } catch (NullPointerException ex) {
