@@ -631,6 +631,7 @@ public class Grand_Exchange extends UnicastRemoteObject implements Observer, IAu
         for (Auction a : auctions) {
             if (a != null) {
                 if (a.getId() == auctionid) {
+                    publisher.inform("currentpricechange", null, auctionid);
                     a.addBid(new Bid(auctionid, u, price));
                     System.out.println("informing clients for auction: " + a.getProductName());
                     a.informClients();

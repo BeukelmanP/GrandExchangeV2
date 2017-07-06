@@ -15,9 +15,6 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.scene.Node;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.Pane;
 
 public abstract class Auction extends UnicastRemoteObject implements Serializable, IAuctionInfo {
 

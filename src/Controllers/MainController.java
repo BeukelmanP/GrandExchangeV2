@@ -14,6 +14,7 @@ import java.beans.PropertyChangeEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ResourceBundle;
@@ -50,7 +51,7 @@ import javax.swing.JOptionPane;
  *
  * @author piete
  */
-public class MainController implements Initializable, IRemotePropertyListener {
+public class MainController extends UnicastRemoteObject implements Initializable, IRemotePropertyListener {
 
     @FXML
     private ScrollPane auctionsPane;
@@ -76,6 +77,12 @@ public class MainController implements Initializable, IRemotePropertyListener {
         // TODO
     }
 
+    public MainController() throws RemoteException {
+        
+    }
+
+    
+    
     public void setUp(RegistryManager RM) throws RemoteException {
         this.RM = RM;
         RM.getAuctionInterface();
@@ -111,7 +118,13 @@ public class MainController implements Initializable, IRemotePropertyListener {
                 allAuctions.setPrefHeight(150 * auctionIDs.size());
                 for (Integer i : auctionIDs) {
                     auctionInfoInterface = RM.getAuction().getIAuctionInterface(i);
-
+                    
+                    String productname = auctionInfoInterface.getProductName();
+                    Double currentPrice = auctionInfoInterface.getCurrentPrice();
+                    String sellerName = auctionInfoInterface.getSellerName();
+                    String pDescription = auctionInfoInterface.getDescription();
+                    String[] imageURLS = auctionInfoInterface.getImageURLs();
+                    
                     Pane Auction = new Pane();
                     Auction.setPrefWidth(800);
                     Auction.setPrefHeight(150);
@@ -120,31 +133,31 @@ public class MainController implements Initializable, IRemotePropertyListener {
                         Auction.setStyle("-fx-background-color: lightgrey ");
                     }
                     Label productName = new Label();
-                    productName.setText(auctionInfoInterface.getProductName());
+                    productName.setText(productname);
                     productName.setFont(new Font("Arial", 25));
                     productName.relocate(150, 25);
 
                     Label price = new Label();
-                    price.setText("€" + auctionInfoInterface.getCurrentPrice());
+                    price.setText("€" + currentPrice);
                     price.setFont(new Font("Arial", 20));
                     price.relocate(550, 120);
 
                     Label seller = new Label();
-                    seller.setText(auctionInfoInterface.getSellerName());
+                    seller.setText(sellerName);
                     seller.setFont(new Font("Arial", 15));
                     seller.relocate(550, 20);
 
                     TextArea description = new TextArea();
                     description.setPrefSize(200, 60);
                     description.relocate(150, 65);
-                    description.setText(auctionInfoInterface.getDescription());
+                    description.setText(pDescription);
                     description.wrapTextProperty().setValue(Boolean.TRUE);
                     description.setEditable(false);
 
                     //setting image of auction
                     ImageView image;
                     try {
-                        image = new ImageView(new Image(auctionInfoInterface.getImageURLs()[0]));
+                        image = new ImageView(new Image(imageURLS[0]));
                     } catch (Exception ex) {
                         image = new ImageView(new Image(this.getClass().getResource("/Classes/unavailable.jpg").toExternalForm()));
                     }
