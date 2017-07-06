@@ -14,6 +14,7 @@ import java.beans.PropertyChangeEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ResourceBundle;
@@ -50,7 +51,7 @@ import javax.swing.JOptionPane;
  *
  * @author piete
  */
-public class MainController implements Initializable, IRemotePropertyListener {
+public class MainController extends UnicastRemoteObject implements Initializable, IRemotePropertyListener {
 
     @FXML
     private ScrollPane auctionsPane;
@@ -76,6 +77,9 @@ public class MainController implements Initializable, IRemotePropertyListener {
         // TODO
     }
 
+    public MainController() throws RemoteException {
+    }
+    
     public void setUp(RegistryManager RM) throws RemoteException {
         this.RM = RM;
         RM.getAuctionInterface();
