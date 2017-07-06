@@ -47,10 +47,10 @@ public class RegistryManager {
     // References to registry and Grand Exchange
     private Registry registry = null;
     private InetAddress localhost;
-    private String ipAddress = "192.168.0.100";
+    private String ipAddress = "169.254.91.174";
 
     public RegistryManager() {
-        getLocalHostIp();
+        //getLocalHostIp();
         setupRegistry();
     }
 
@@ -192,7 +192,7 @@ System.out.println("Client: Cannot bind QueuePurchase Interface");
 
         // Locate registry at IP address and port number
         try {
-            registry = LocateRegistry.getRegistry("localhost", portNumber);
+            registry = LocateRegistry.getRegistry("169.254.91.174", portNumber);
 
             if (registry != null) {
                 System.out.println("Client: Registry located");

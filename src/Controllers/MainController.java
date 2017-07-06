@@ -117,6 +117,7 @@ public class MainController extends UnicastRemoteObject implements Initializable
                 start = System.currentTimeMillis();
                 allAuctions.setPrefWidth(800);
                 allAuctions.setPrefHeight(150 * auctionIDs.size());
+                int value = 0;
                 for (Integer i : auctionIDs) {
                     auctionInfoInterface = RM.getAuction().getIAuctionInterface(i);
 
@@ -130,10 +131,11 @@ public class MainController extends UnicastRemoteObject implements Initializable
                     Pane Auction = new Pane();
                     Auction.setPrefWidth(800);
                     Auction.setPrefHeight(150);
-                    Auction.relocate(0, 150 * i);
-                    if ((i % 2) == 0) {
+                    Auction.relocate(0, 150 * value);
+                    if ((value % 2) == 0) {
                         Auction.setStyle("-fx-background-color: lightgrey ");
                     }
+                    value++;
                     Label productName = new Label();
                     productName.setText(productname);
                     productName.setFont(new Font("Arial", 25));
