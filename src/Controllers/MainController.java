@@ -28,6 +28,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
@@ -162,12 +163,15 @@ public class MainController extends UnicastRemoteObject implements Initializable
                     image.setFitWidth(100);
                     image.setFitHeight(100);
                     image.relocate(25, 25);
+                    image.setUserData(auctionInfoInterface);
                     image.addEventHandler(MouseEvent.MOUSE_CLICKED,
                             new EventHandler<MouseEvent>() {
                         @Override
                         public void handle(MouseEvent e) {
                             try {
-                                showAuction(auctionInfoInterface);
+                                ImageView myImage = (ImageView)e.getSource();
+                                IAuctionInfo myAuctionInfo = (IAuctionInfo)myImage.getUserData();
+                                showAuction(myAuctionInfo);
                             } catch (IOException ex) {
                                 Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
                             }
@@ -175,6 +179,15 @@ public class MainController extends UnicastRemoteObject implements Initializable
                     });
 
                     Auction.getChildren().addAll(productName, image, price, seller, description);
+                    
+                                 
+                    //invisible auctionid node to store auctionid as string
+                    Label auctionIDlabel = new Label();
+                    Integer auctionID = auctionInfoInterface.getId();
+                    auctionIDlabel.setText(auctionID.toString());
+                    auctionIDlabel.setVisible(false);
+                    Auction.getChildren().add(auctionIDlabel);
+                    
                     allAuctions.getChildren().add(Auction);
                 }
                 elapsedTime = System.currentTimeMillis() - start;
@@ -291,10 +304,21 @@ public class MainController extends UnicastRemoteObject implements Initializable
 //                IAuctionInfo myAuctionInfoInterface = this.auctionInterface.getIAuctionInterface((int)pce.getNewValue());
 //                allAuctions.getChildren().get(5);
                 IAuctionInfo myAuctionInfoInterface = auctionInterface.getIAuctionInterface((int)pce.getNewValue());
-                Pane myPane = (Pane)allAuctions.getChildren().get((int)pce.getNewValue());
-                Label priceLabel = (Label)myPane.getChildren().get(2);
-                priceLabel.setText("€" + myAuctionInfoInterface.getCurrentPrice());
+                
+                for (Node thisPane : allAuctions.getChildren())
+                {
+                    Pane thissPane = (Pane)thisPane;
+                    Label auctionIDLabel = (Label)thissPane.getChildren().get(5);
+                    Integer auctionID = Integer.parseInt(auctionIDLabel.getText());
+                    if (auctionID.equals(myAuctionInfoInterface.getId()))
+                    {
+                        Pane myPane = (Pane)thissPane;
+                        Label priceLabel = (Label)myPane.getChildren().get(2);
+                        priceLabel.setText("€" + myAuctionInfoInterface.getCurrentPrice());
+                    }
+                }
                 auctionsPane.setContent(allAuctions);
+                
                 
               break; // optional
 
