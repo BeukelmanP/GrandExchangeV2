@@ -11,6 +11,10 @@ import fontyspublisher.IRemotePropertyListener;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Collection;
+import javafx.scene.Node;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
 
 /**
  *
@@ -20,6 +24,12 @@ public interface IAuctionInfo extends Remote{
     
     public void subscribe(IRemotePropertyListener listener, String property) throws RemoteException;
     public void unSubscribe(IRemotePropertyListener listener, String property) throws RemoteException;
+    public void subscribeRegisterProductName(IRemotePropertyListener listener, String property, String productName) throws RemoteException;
+    public void subscribeRegisterCurrentPrice(IRemotePropertyListener listener, String property, Double currentPrice) throws RemoteException;
+    public void subscribeRegisterDescription(IRemotePropertyListener listener, String property, String description) throws RemoteException;
+    public void subscribeRegisterImage(IRemotePropertyListener listener, String property, Object image) throws RemoteException;
+    public void subscribeRegisterSellerName(IRemotePropertyListener listener, String property, String sellerName) throws RemoteException;
+
     public String[] getImageURLs() throws RemoteException;
     public String getSellerImageUrl() throws RemoteException;
     public StatusEnum getStatus() throws RemoteException;

@@ -70,7 +70,6 @@ public class MainController extends UnicastRemoteObject implements IRemoteProper
 
     private RegistryManager RM;
     private IAuction auctionInterface;
-    private RemotePublisher publisher;
     Pane allAuctions;
 
 
@@ -94,7 +93,7 @@ public class MainController extends UnicastRemoteObject implements IRemoteProper
         allAuctions = new Pane();
         RM.getAuctionInterface();
         auctionInterface = RM.getAuction();
-        publisher = new RemotePublisher();  
+        //publisher = new RemotePublisher();
         //this.refreshAuctions();
         try {
             loggedInUserImage.setImage(new Image(RM.getUser().getImageURL()));
@@ -125,10 +124,10 @@ public class MainController extends UnicastRemoteObject implements IRemoteProper
             {
                 allAuctions.setPrefHeight(this.auctionsPane.getPrefHeight() + auctionsPane.getPrefHeight());
                 this.auctionsPane.setPrefHeight(allAuctions.getPrefHeight());
-                
-                publisher.registerProperty("auctionPane" + i);
-                publisher.subscribeRemoteListener(this, "auctionPane" + i);
-                publisher.inform("auctionPane" + i, this, auctionPane);  
+//                
+//                publisher.registerProperty("auctionPane" + i);
+//                publisher.subscribeRemoteListener(this, "auctionPane" + i);
+//                publisher.inform("auctionPane" + i, this, auctionPane);  
             }
         }
         this.auctionsPane.setContent(allAuctions);
@@ -228,15 +227,16 @@ public class MainController extends UnicastRemoteObject implements IRemoteProper
 //        System.out.println("PerformanceSetAuctionsPaneInMS=" + elapsedTime);
 //    }
     
-    public Pane getPaneOfAuction(int i)
+    
+    public Pane getPaneOfAuction(int ID)
     {
         Pane auctionPane = new Pane();
         try {
-            IAuctionInfo auctionInfoInterface = auctionInterface.getIAuctionInterface(i);
+            IAuctionInfo auctionInfoInterface = auctionInterface.getIAuctionInterface(ID);
             auctionPane.setPrefWidth(800);
             auctionPane.setPrefHeight(150);
-            auctionPane.relocate(0, 150 * i);
-            if ((i % 2) == 0) {
+            auctionPane.relocate(0, 150 * ID);
+            if ((ID % 2) == 0) {
                 auctionPane.setStyle("-fx-background-color: lightgrey ");
             }
             Label productName = new Label();
@@ -290,7 +290,14 @@ public class MainController extends UnicastRemoteObject implements IRemoteProper
             auctionIDlabel.setText(auctionID.toString());
             auctionIDlabel.setVisible(false);
             auctionPane.getChildren().add(auctionIDlabel);
+            
+            auctionInfoInterface.subscribeRegisterProductName(this, "productName" + auctionID, auctionInfoInterface.getProductName());
+            auctionInfoInterface.subscribeRegisterCurrentPrice(this, "currentPrice" + auctionID, auctionInfoInterface.getCurrentPrice());
+            auctionInfoInterface.subscribeRegisterDescription(this, "description" + auctionID, auctionInfoInterface.getDescription());
+            auctionInfoInterface.subscribeRegisterImage(this, "imageThumbnail" + auctionID, image.getUserData());
+            auctionInfoInterface.subscribeRegisterSellerName(this, "sellerName" + auctionID, auctionInfoInterface.getSellerName());
 
+            //auctionInfoInterface.subscribeAndRegisterPane(this, "auctionPane" + auctionInfoInterface.getId(), auctionPane);
         } catch (RemoteException ex) {
             Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -384,10 +391,9 @@ public class MainController extends UnicastRemoteObject implements IRemoteProper
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) throws RemoteException {
-        //HOE HET ZOU MOETEN IN THEORIE!!!  Note: bij de eerste inform zijn de childs sowieso nog null, omdat de content van de auctionspane nog niet is geset.
         System.out.println("Maincontroller detected propertyChange of " + evt.getPropertyName());
                 
-        String compareString = "auctionPane.*";
+        String compareString = "sellerName.*";
         /* kijk wat het producttype is, if bepaald type handel af voor dat type*/
         if (evt.getPropertyName().matches(compareString))
         {
@@ -407,99 +413,21 @@ public class MainController extends UnicastRemoteObject implements IRemoteProper
                 {
                     Pane pane = (Pane)node;
                     Label auctionIDLabel = (Label)pane.getChildren().get(5);
+                    
                     Integer auctionIDFromLabel = parseInt(auctionIDLabel.getText());
                     if (auctionID.equals(auctionIDFromLabel))
                     {
-                        toRemove.add(node);
+                        //toRemove.add(node);
+                        auctionIDLabel.setText((String)evt.getNewValue());
                     }
                 }
-                if (!toRemove.isEmpty())
-                {
-                    allAuctions.getChildren().removeAll(toRemove);
-                }
+//                if (!toRemove.isEmpty())
+//                {
+//                    allAuctions.getChildren().removeAll(toRemove);
+//                }
                 allAuctions.getChildren().add(auctionPane);
             }      
         }
-        /*maak if statements voor de andere cases (currentprice, imagethumbnail enzovoorts)*/
-
-        
-//        //implementeer ondergegeven switch voor de maincontroller's auctions
-//        System.out.println("Maincontroller detected propertyChange of " + evt.getPropertyName());
-//        
-//        Pane allAuctions = (Pane)this.auctionsPane.getContent();
-//        
-//        int auctionID = -1;
-//        String compareString = "productname.*";
-//        if (evt.getPropertyName().matches(compareString))
-//        {
-//            int i = 0;
-//            auctionID = Integer.parseInt(evt.getPropertyName().substring(compareString.length()-2, evt.getPropertyName().length()));
-//            
-//            for (Node child : allAuctions.getChildren()) //het aantal children is 16...zijn dit de auctions?
-//            {
-//                i++;
-//                //object o is ALTIJD null. Maar dit kan toch niet als er een lijst met children is? 
-//                //je hoort toch geen list van null objecten te krijgen? 
-//                //als ik in debug mode naar child kijk, lijkt het niet een null object... vreemd                
-//                Object o = child; 
-//                System.out.println(o);
-//                System.out.println(i);
-//            }
-//        }
-//        else
-//        {
-//            
-//        }
-//        compareString = "currentprice.*";
-//        if (evt.getPropertyName().matches(compareString))
-//        {
-//            auctionID = Integer.parseInt(evt.getPropertyName().substring(compareString.length()-2, evt.getPropertyName().length()));
-//            for (Auction a : this.auctionInterface.getAuctions())
-//            {
-//                if (a.equals(this.auctionInterface.getAuction(auctionID)))
-//                {
-//                    a.setCurrentPrice((Double)evt.getNewValue());
-//                }
-//            }
-//        }
-//        compareString = "sellername.*";
-//        if (evt.getPropertyName().matches(compareString))
-//        {
-//            auctionID = Integer.parseInt(evt.getPropertyName().substring(compareString.length()-2, evt.getPropertyName().length()));
-//            for (Auction a : this.auctionInterface.getAuctions())
-//            {
-//                if (a.equals(this.auctionInterface.getAuction(auctionID)))
-//                {
-//                    a.setSellername((String)evt.getNewValue());
-//                }
-//            }        
-//        }      
-//        compareString = "description.*";
-//        if (evt.getPropertyName().matches(compareString))
-//        {
-//            auctionID = Integer.parseInt(evt.getPropertyName().substring(compareString.length()-2, evt.getPropertyName().length()));
-//            for (Auction a : this.auctionInterface.getAuctions())
-//            {
-//                if (a.equals(this.auctionInterface.getAuction(auctionID)))
-//                {
-//                    a.setDescription((String)evt.getNewValue());
-//                }
-//            }
-//        }
-//        compareString = "imagethumbnail.*";
-//        if (evt.getPropertyName().matches(compareString))
-//        {
-//            auctionID = Integer.parseInt(evt.getPropertyName().substring(compareString.length()-2, evt.getPropertyName().length()));
-//            for (Auction a : this.auctionInterface.getAuctions())
-//            {
-//                if (a.equals(this.auctionInterface.getAuction(auctionID)))
-//                {
-//                    a.setImagethumbnail((Image)evt.getNewValue());
-//                }
-//            }
-//        }
-        
-
     }
 }
 

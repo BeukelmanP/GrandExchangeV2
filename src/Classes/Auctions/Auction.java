@@ -15,6 +15,9 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.scene.Node;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
 
 public abstract class Auction extends UnicastRemoteObject implements Serializable, IAuctionInfo {
 
@@ -276,6 +279,59 @@ public abstract class Auction extends UnicastRemoteObject implements Serializabl
     public void unSubscribe(IRemotePropertyListener listener, String property) throws RemoteException {
         publisher.unsubscribeRemoteListener(listener, property);
     }
+    
+//    @Override
+//    public void subscribeRegisterInformObjects(IRemotePropertyListener listener, String property, Collection<Object> objects) throws RemoteException {
+//
+//        for (Object o : objects)
+//        {
+//            if (o instanceof String)
+//            {
+//                
+//            }
+//            publisher.registerProperty(property);
+//            publisher.subscribeRemoteListener(listener, property);
+//            publisher.inform(property, listener, );  
+//        }
+//    }
+    
+    @Override
+    public void subscribeRegisterProductName(IRemotePropertyListener listener, String property, String productName) throws RemoteException
+    {
+        publisher.registerProperty(property);
+        publisher.subscribeRemoteListener(listener, property);
+        publisher.inform(property, listener, productName);    
+    }
+    @Override
+    public void subscribeRegisterCurrentPrice(IRemotePropertyListener listener, String property, Double currentPrice) throws RemoteException
+    {
+        publisher.registerProperty(property);
+        publisher.subscribeRemoteListener(listener, property);
+        publisher.inform(property, listener, currentPrice);   
+    }
+    @Override
+    public void subscribeRegisterDescription(IRemotePropertyListener listener, String property, String description) throws RemoteException
+    {
+        publisher.registerProperty(property);
+        publisher.subscribeRemoteListener(listener, property);
+        publisher.inform(property, listener, description);   
+    }
+    @Override
+    public void subscribeRegisterImage(IRemotePropertyListener listener, String property, Object image) throws RemoteException
+    {
+        publisher.registerProperty(property);
+        publisher.subscribeRemoteListener(listener, property);
+        publisher.inform(property, listener, image);   
+    }
+    @Override
+    public void subscribeRegisterSellerName(IRemotePropertyListener listener, String property, String sellerName) throws RemoteException
+    {
+        publisher.registerProperty(property);
+        publisher.subscribeRemoteListener(listener, property);
+        publisher.inform(property, listener, sellerName);   
+    }
+    
+
     
     public synchronized void informClients(){
         try {
