@@ -97,6 +97,7 @@ public class Grand_Exchange extends UnicastRemoteObject implements Observer, IAu
         dbListener.addObserver(this);
         publisher = new RemotePublisher();
         publisher.registerProperty("newauction");
+        publisher.registerProperty("currentpricechange");
     }
 
     /**

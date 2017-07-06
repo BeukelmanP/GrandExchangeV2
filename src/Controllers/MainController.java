@@ -7,7 +7,9 @@ package Controllers;
 
 import Classes.CategoryEnum;
 import Interfaces.IAuctionInfo;
+import fontyspublisher.IRemotePropertyListener;
 import grandexchange.RegistryManager;
+import java.beans.PropertyChangeEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.rmi.RemoteException;
@@ -47,7 +49,7 @@ import javax.swing.JOptionPane;
  *
  * @author piete
  */
-public class MainController implements Initializable {
+public class MainController implements Initializable, IRemotePropertyListener {
 
     @FXML
     private ScrollPane auctionsPane;
@@ -60,6 +62,7 @@ public class MainController implements Initializable {
 
     private RegistryManager RM;
     private IAuctionInfo auctionInfoInterface;
+    private IAuction auctionInterface;
 
     /**
      * Initializes the controller class.
@@ -75,6 +78,11 @@ public class MainController implements Initializable {
     public void setUp(RegistryManager RM) throws RemoteException {
         this.RM = RM;
         RM.getAuctionInterface();
+        this.auctionInterface = RM.getAuction();
+        this.auctionInterface.subscribe(this, "newauction");
+        this.auctionInterface.subscribe(this, "currentpricechange");
+
+        //this.refreshAuctions();
         try {
             loggedInUserImage.setImage(new Image(RM.getUser().getImageURL()));
         } catch (NullPointerException ex) {
@@ -261,5 +269,19 @@ public class MainController implements Initializable {
 
     public void button_exit() {
         Runtime.getRuntime().halt(1);
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent pce) throws RemoteException {
+        
+        switch(pce.getPropertyName()) {
+           case "currentpricechange" :
+              // Statements
+              break; // optional
+
+           case "newauction" :
+              // Statements
+              break; // optional   
+        }
     }
 }
