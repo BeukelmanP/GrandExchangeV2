@@ -65,6 +65,7 @@ public class MainController extends UnicastRemoteObject implements Initializable
     private RegistryManager RM;
     private IAuctionInfo auctionInfoInterface;
     private IAuction auctionInterface;
+    private Pane allAuctions;
 
     /**
      * Initializes the controller class.
@@ -83,6 +84,7 @@ public class MainController extends UnicastRemoteObject implements Initializable
     public void setUp(RegistryManager RM) throws RemoteException {
         this.RM = RM;
         RM.getAuctionInterface();
+        allAuctions = new Pane();
         this.auctionInterface = RM.getAuction();
         this.auctionInterface.subscribe(this, "newauction");
         this.auctionInterface.subscribe(this, "currentpricechange");
@@ -110,7 +112,6 @@ public class MainController extends UnicastRemoteObject implements Initializable
 
                 //draw auctions
                 start = System.currentTimeMillis();
-                Pane allAuctions = new Pane();
                 allAuctions.setPrefWidth(800);
                 allAuctions.setPrefHeight(150 * auctionIDs.size());
                 for (Integer i : auctionIDs) {
@@ -178,7 +179,7 @@ public class MainController extends UnicastRemoteObject implements Initializable
                 }
                 elapsedTime = System.currentTimeMillis() - start;
                 System.out.println("PerformanceSetAuctionsPaneInMS=" + elapsedTime);
-
+                
                 return allAuctions;
             }
         };
@@ -287,6 +288,14 @@ public class MainController extends UnicastRemoteObject implements Initializable
         switch(pce.getPropertyName()) {
            case "currentpricechange" :
               // Statements
+//                IAuctionInfo myAuctionInfoInterface = this.auctionInterface.getIAuctionInterface((int)pce.getNewValue());
+//                allAuctions.getChildren().get(5);
+                IAuctionInfo myAuctionInfoInterface = auctionInterface.getIAuctionInterface((int)pce.getNewValue());
+                Pane myPane = (Pane)allAuctions.getChildren().get((int)pce.getNewValue());
+                Label priceLabel = (Label)myPane.getChildren().get(2);
+                priceLabel.setText("€" + myAuctionInfoInterface.getCurrentPrice());
+                auctionsPane.setContent(allAuctions);
+                
               break; // optional
 
            case "newauction" :
