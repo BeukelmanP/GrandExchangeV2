@@ -67,6 +67,7 @@ public class MainController extends UnicastRemoteObject implements Initializable
     private IAuctionInfo auctionInfoInterface;
     private IAuction auctionInterface;
     private Pane allAuctions;
+    private ArrayList<Label> labelList;
 
     /**
      * Initializes the controller class.
@@ -81,9 +82,10 @@ public class MainController extends UnicastRemoteObject implements Initializable
 
     public MainController() throws RemoteException {
     }
-    
+
     public void setUp(RegistryManager RM) throws RemoteException {
         this.RM = RM;
+        labelList = new ArrayList<>();
         RM.getAuctionInterface();
         allAuctions = new Pane();
         this.auctionInterface = RM.getAuction();
@@ -117,13 +119,14 @@ public class MainController extends UnicastRemoteObject implements Initializable
                 allAuctions.setPrefHeight(150 * auctionIDs.size());
                 for (Integer i : auctionIDs) {
                     auctionInfoInterface = RM.getAuction().getIAuctionInterface(i);
-                    
+
+                    int auctionId = auctionInfoInterface.getId();
                     String productname = auctionInfoInterface.getProductName();
                     Double currentPrice = auctionInfoInterface.getCurrentPrice();
                     String sellerName = auctionInfoInterface.getSellerName();
                     String pDescription = auctionInfoInterface.getDescription();
                     String[] imageURLS = auctionInfoInterface.getImageURLs();
-                    
+
                     Pane Auction = new Pane();
                     Auction.setPrefWidth(800);
                     Auction.setPrefHeight(150);
@@ -140,6 +143,8 @@ public class MainController extends UnicastRemoteObject implements Initializable
                     price.setText("€" + currentPrice);
                     price.setFont(new Font("Arial", 20));
                     price.relocate(550, 120);
+                    price.setId(Integer.toString(auctionId));
+                    labelList.add(price);
 
                     Label seller = new Label();
                     seller.setText(sellerName);
@@ -169,8 +174,8 @@ public class MainController extends UnicastRemoteObject implements Initializable
                         @Override
                         public void handle(MouseEvent e) {
                             try {
-                                ImageView myImage = (ImageView)e.getSource();
-                                IAuctionInfo myAuctionInfo = (IAuctionInfo)myImage.getUserData();
+                                ImageView myImage = (ImageView) e.getSource();
+                                IAuctionInfo myAuctionInfo = (IAuctionInfo) myImage.getUserData();
                                 showAuction(myAuctionInfo);
                             } catch (IOException ex) {
                                 Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
@@ -179,20 +184,19 @@ public class MainController extends UnicastRemoteObject implements Initializable
                     });
 
                     Auction.getChildren().addAll(productName, image, price, seller, description);
-                    
-                                 
+
                     //invisible auctionid node to store auctionid as string
                     Label auctionIDlabel = new Label();
                     Integer auctionID = auctionInfoInterface.getId();
                     auctionIDlabel.setText(auctionID.toString());
                     auctionIDlabel.setVisible(false);
                     Auction.getChildren().add(auctionIDlabel);
-                    
+
                     allAuctions.getChildren().add(Auction);
                 }
                 elapsedTime = System.currentTimeMillis() - start;
                 System.out.println("PerformanceSetAuctionsPaneInMS=" + elapsedTime);
-                
+
                 return allAuctions;
             }
         };
@@ -297,32 +301,31 @@ public class MainController extends UnicastRemoteObject implements Initializable
 
     @Override
     public void propertyChange(PropertyChangeEvent pce) throws RemoteException {
-        
-        switch(pce.getPropertyName()) {
-           case "currentpricechange" :
-              // Statements
-                IAuctionInfo myAuctionInfoInterface = auctionInterface.getIAuctionInterface((int)pce.getNewValue());
-                
-                for (Node thisPane : allAuctions.getChildren())
-                {
-                    Pane thissPane = (Pane)thisPane;
-                    Label auctionIDLabel = (Label)thissPane.getChildren().get(5);
-                    Integer auctionID = Integer.parseInt(auctionIDLabel.getText());
-                    if (auctionID.equals(myAuctionInfoInterface.getId()))
-                    {
-                        Pane myPane = (Pane)thissPane;
-                        Label priceLabel = (Label)myPane.getChildren().get(2);
-                        priceLabel.setText("€" + myAuctionInfoInterface.getCurrentPrice());
+
+        switch (pce.getPropertyName()) {
+            case "currentpricechange":
+                // Statements
+                IAuctionInfo myAuctionInfoInterface = auctionInterface.getIAuctionInterface((int) pce.getNewValue());
+                for (Label L : labelList) {
+                    if (L.getId().equals(Integer.toString(myAuctionInfoInterface.getId()))) {
+                        Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    L.setText(myAuctionInfoInterface.getCurrentPrice().toString());
+                                } catch (RemoteException ex) {
+                                    Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                            }
+                        });
                     }
                 }
-                auctionsPane.setContent(allAuctions);
-                
-                
-              break; // optional
 
-           case "newauction" :
-              // Statements
-              break; // optional   
+                break; // optional
+
+            case "newauction":
+                // Statements
+                break; // optional   
         }
     }
 }
